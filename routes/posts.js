@@ -14,7 +14,9 @@ router.get('/', function(request, response, next) {
     include: [models.users, models.tags]
   }) // default order: modifiedAt
     .then(function(posts) {
-      response.render('index', { posts: posts });
+      response.render('index', {
+        title: 'Some Fun Posts',
+        posts: posts });
     });
 });
 
@@ -58,6 +60,16 @@ router.get('/:id', function(request, response, next) {
   });
 });
 
+// POST /posts/:id/new-comment
+router.post('/:id/comments/new', (request, response) => {
+  models.comments.create({
+    content: request.body.text,
+    postId: request.params.id
+  }).then((comment) => {
+    response.json(comment);
+  });
+});
+
 // POST /posts/:id
 // edit post
 router.post('/:id/edit', function(request, response) {
@@ -70,16 +82,6 @@ router.post('/:id/edit', function(request, response) {
       .then(function(){
         response.redirect('../'); // GET /posts
     });
-  });
-});
-
-// POST /posts/:id/new-comment
-router.post('/:id/comments/new', (request, response) => {
-  models.comments.create({
-    content: request.body.text,
-    postId: request.params.id
-  }).then((comment) => {
-    response.json(comment);
   });
 });
 

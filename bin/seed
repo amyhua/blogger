@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const models = require('../models'); // models/index.js
+const models = require('../db'); // models/index.js
 const fixtures = require('../fixtures'); // fixtures/index.js
 
 // force: true = drops the existing table

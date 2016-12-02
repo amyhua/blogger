@@ -1,25 +1,3 @@
-# Development
-
-Change `config/config.json` username and password to conform to your postgres credentials.
-
-To have your app run at port 1337,
-
-```sh
-$ export PORT=1337 && npm start
-```
-
-
-## Style
-
-We follow this [Node.js Style Guide](https://github.com/felixge/node-style-guide) for writing consistent and well formatted node code. Please review the style guide.
-
-Your final projects should include the `.eslintrc` file in this style guide, and all of the rules should pass (with no red flags or errors) upon submitting your final project. 
-
-Please review the rules.
-
-
-----
-
 # Workshop
 
 ## Adding blog post comments & tags

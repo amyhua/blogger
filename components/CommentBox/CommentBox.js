@@ -3,77 +3,30 @@ import React, { Component, PropTypes } from 'react';
 class CommentBox extends Component {
   constructor(props) {
     super(props); // makes this a React component
-    this.state = {
-      text: '',
-      addedPhoto: false
-    };
-    // custom method? bind them!
-    this.handleChange = this.handleChange.bind(this);
-    this.toggleAddPhoto = this.toggleAddPhoto.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
+
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleChange(event) {
-    this.setState({
-      text: event.target.value
-    }, () => {
-      // success callback as the second argument in setState
-      console.log('handleChange: sets text to ', this.state.text);
-    });
-  }
-
-  toggleAddPhoto(e) {
-    // click handler on the added photo button
-    this.setState({
-      addedPhoto: !this.state.addedPhoto
-    });
-  }
-
-  // componentWillMount() {
-  //   // happens before the FIRST render 
-  //   // can access the client
-  //   console.log('component will mount', window, 'only called once!');
-  // }
-
-  // componentWillUpdate() {
-  //   console.log('component will update gets called on every state/prop change')
-  // }
-
-  // componentDidUpdate() {
-  //   console.log('component DID update');
-  // }
-
-  onSubmit(e) {
+  handleSubmit(e) {
     e.preventDefault();
-    $.post(`/posts/${this.props.postId}/comments/new`, {
-      text: this.state.text
-    }, (response) => {
-      // on success, get back the json
-      console.log('Successfully added a comment!', response);
-    });
+    this.props.onFormSubmit(this.props.postId, this.props.commentForm.text)
   }
 
   render() {
-    const addedPhotoLength = this.state.text.length + (this.state.addedPhoto ? 20 : 0);
     return (
       <form className="well clearfix"
-        onSubmit={this.onSubmit}>
+        onSubmit={this.handleSubmit}>
         <textarea
-          onChange={this.handleChange}
+          value={this.props.commentForm.text}
+          onChange={(e) => this.props.onFormChange(e.target.value)}
           className="form-control"></textarea><br/>
         <span>
-          {300 - addedPhotoLength} remaining characters.
+          {300 - this.props.commentForm.text.length} remaining characters.
         </span>
-        <button
-          type="button"
-          className="btn btn-primary pull-right"
-          onClick={this.toggleAddPhoto}>
-          {this.state.addedPhoto ? "Added Photo" : "Add Photo"}
-        </button>
         <input
           type="submit"
           value="Comment"
-          disabled={addedPhotoLength === 0 || addedPhotoLength > 300}
+          disabled={this.props.commentForm.text.length === 0 || this.props.commentForm.text.length > 300}
           className="btn btn-primary pull-right" />
       </form>
     );
@@ -81,7 +34,9 @@ class CommentBox extends Component {
 }
 
 CommentBox.propTypes = {
-  postId: PropTypes.string.isRequired
+  postId: PropTypes.string.isRequired,
+  onFormSubmit: PropTypes.func.isRequired,
+  onFormChange: PropTypes.func.isRequired
 };
 
 export default CommentBox;

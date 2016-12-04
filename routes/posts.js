@@ -5,7 +5,7 @@ const debug = require('debug')('blogger');
 
 // Holds all of our models as keys inside model object
 // models.users, models.posts, etc.
-const models  = require('../db');
+const models  = require('../models/');
 
 // GET /posts
 // show all posts
@@ -13,9 +13,17 @@ router.get('/', function(request, response, next) {
   models.posts.findAll({
     include: [models.users, models.tags]
   }) // default order: modifiedAt
-  .then(function(posts) {
-    response.json({ posts: posts });
-  });
+    .then(function(posts) {
+      response.render('index', {
+        title: 'Some Fun Posts',
+        posts: posts });
+    });
+});
+
+// GET /posts/new
+// create post
+router.get('/new', function(request, response, next) {
+  response.render('new_post', { post: {} });
 });
 
 router.post('/new', function(request, response, next) {
@@ -52,6 +60,16 @@ router.get('/:id', function(request, response, next) {
   });
 });
 
+// POST /posts/:id/new-comment
+router.post('/:id/comments/new', (request, response) => {
+  models.comments.create({
+    content: request.body.text,
+    postId: request.params.id
+  }).then((comment) => {
+    response.json(comment);
+  });
+});
+
 // POST /posts/:id
 // edit post
 router.post('/:id/edit', function(request, response) {
@@ -64,16 +82,6 @@ router.post('/:id/edit', function(request, response) {
     .then(function(){
       response.json(post); // GET /posts
     });
-  });
-});
-
-// POST /posts/:id/new-comment
-router.post('/:id/comments/new', (request, response) => {
-  models.comments.create({
-    content: request.body.text,
-    postId: request.params.id
-  }).then((comment) => {
-    response.json(comment);
   });
 });
 

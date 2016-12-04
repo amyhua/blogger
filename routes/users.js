@@ -1,26 +1,32 @@
 var express = require('express');
 var router = express.Router();
-const models  = require('../db');
 
 module.exports = function(passport) {
+	// GET /api/users
+	router.get('/', function(req, res) {
+		res.render('index');
+	});
 
 	// POST /api/user/signup
 	router.post('/signup', function(req, res, next) {
 		passport.authenticate('local-signup', function(err, user, info) {
 			if (err) {
-			  	return next(err); // will generate a 500 error
+				return next(err); // will generate a 500 error
 			}
 
 			if (!user) {
-			   	return next({ error : true, message : info });
+				return next({
+					error: true,
+					message: info
+				});
 			}
 
 			req.login(user, function(loginErr) {
-			   	if (loginErr) {
-			     	return next(loginErr);
-			   	}
-			   	return res.json(user);
-			}); 
+				if (loginErr) {
+					return next(loginErr);
+				}
+				return res.json(user);
+			});
 		})(req, res, next);
 	});
 
@@ -28,19 +34,22 @@ module.exports = function(passport) {
 	router.post('/login', function(req, res, next) {
 		passport.authenticate('local-login', function(err, user, info) {
 			if (err) {
-			  	return next(err); // will generate a 500 error
+				return next(err); // will generate a 500 error
 			}
 
-			if (! user) {
-			   	return next({ error : true, message : info });
+			if (!user) {
+				return next({
+					error: true,
+					message: info
+				});
 			}
 
 			req.login(user, function(loginErr) {
-			    if (loginErr) {
+				if (loginErr) {
 					return next(loginErr);
-			    }
-			    return res.json(user);
-			}); 
+				}
+				return res.json(user);
+			});
 		})(req, res, next);
 	});
 

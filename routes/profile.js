@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const models  = require('../db');
+const models  = require('../models/');
 
 // GET /api/protected/profile/:id
 router.get('/profile/:id', function(req, res, next) {

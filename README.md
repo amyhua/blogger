@@ -1,3 +1,17 @@
+# Development
+
+You will need to have Xcode successfully installed from the *App store* first for `bcrypt` to be successfully installed.
+
+Also be sure to have the latest NPM: `npm install -g npm@latest` or `npm update`
+
+```
+npm install
+npm start
+```
+
+to see it running on localhost with either your given `$PORT` or (localhost:3000)[http://localhost:3000/].
+
+----
 # Workshop
 
 ## Adding blog post comments & tags

@@ -2,7 +2,7 @@ module.exports = {
   entry: './client.js',
   output: {
     path: './public',
-    filename: 'bundle.js'       
+    filename: 'bundle.js'
   },
   resolve: {
     extensions: ['', '.js', '.jsx']
@@ -17,5 +17,9 @@ module.exports = {
         presets: ['es2015', 'react']
       }
     }]
+  },
+
+  resolve: {
+    extensions: ['', '.js', '.json', '.jsx']
   }
 };

@@ -1,6 +1,5 @@
 var express = require('express');
 var path = require('path');
-var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -37,18 +36,18 @@ app.use('/api/user', userRoutes);
 app.use('/api/protected', function(req, res, next) {
   passport.authenticate('jwt', {session:false}, function(err, user, jwtError) {
     if (user) {
-      req.login(user, null, () => {})
-      next()
+      req.login(user, null, null);
+      next();
     } else  {
-      next(jwtError)
+      next(jwtError);
     }
-  })(req, res, next)
+  })(req, res, next);
 });
 
-app.use('/api/protected', profileRoutes)
+app.use('/api/protected', profileRoutes);
 
-app.route(/.*/).get(function(req, res, next) {
-  res.sendFile(path.join(__dirname, 'public/index.html'))
+app.route(/.*/).get(function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 // catch 404 and forward to error handler
@@ -63,7 +62,7 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
+  app.use(function(err, req, res) {
     console.error('DEV ERROR')
     res.status(err.status || 500);
     res.json({
@@ -74,7 +73,7 @@ if (app.get('env') === 'development') {
 } else {
   // production error handler
   // no stacktraces leaked to user
-  app.use(function(err, req, res, next) {
+  app.use(function(err, req, res) {
     res.status(err.status || 500);
     console.error('PROD ERROR')
     res.json({

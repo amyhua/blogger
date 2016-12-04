@@ -2,6 +2,7 @@
   "env": {
     "node": true
   },
+  "parser": "babel-eslint",
   "rules": {
     "array-bracket-spacing": [2, "never"],
     "block-scoped-var": 2,
@@ -20,10 +21,24 @@
     "no-trailing-spaces": 2,
     "no-unused-vars": 1,
     "no-use-before-define": [2, "nofunc"],
-    "object-curly-spacing": [2, "never"],
-    "quotes": [2, "single", "avoid-escape"],
+    "quotes": [
+      2,
+      "single", {
+        "allowTemplateLiterals": true
+      }
+    ],
     "semi": [2, "always"],
-    "keyword-spacing": [2, {"before": true, "after": true}],
-    "space-unary-ops": 2
+    "keyword-spacing": [2, {
+      "before": true,
+      "after": true
+    }],
+    "space-unary-ops": 2,
+    "no-shadow": 1,
+    "import/no-extraneous-dependencies": "off",
+    "import/unambiguous": "off"
+  },
+  "ecmaFeatures": {
+    "jsx": true,
+    "modules": true
   }
 }

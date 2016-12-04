@@ -1,13 +1,13 @@
-import React, { Component, PropTypes } from 'react';
-import UserAuthForm from '../ConnectedComponents/UserAuthFormApp'
+import React, { Component } from 'react';
+import UserAuthFormApp from '../../containers/UserAuthFormApp';
 
-export default class PostForm extends Component {
+export default class Signup extends Component {
 
 	render() {
 		return (
 			<div>
-				<UserAuthForm signUp={true}/>
+				<UserAuthFormApp signUp={true} />
 			</div>
 		);
 	}
-}
+};

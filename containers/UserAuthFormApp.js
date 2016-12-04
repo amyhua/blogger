@@ -3,59 +3,60 @@ import {
   initiateHTTPRequest,
   onSignUpEmailChange,
   onSignUpPasswordChange,
-  processHTTPError 
-} from '../../actions';
+  processHTTPError
+} from '../actions';
 
-import { browserHistory } from 'react-router'
+import { browserHistory } from 'react-router';
 
-import { auth } from '../UserAuth/services/user-auth-service';
+import auth from '../services/auth';
 
-import UserAuthForm from '../UserAuth/UserAuthForm';
+import UserAuthForm from '../components/UserAuth/UserAuthForm';
 
 import fetch from 'isomorphic-fetch';
 
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state) => {
   return {
-    userAuthForm: state.userAuthForm || {},
-    requestPending: state.requestPending || false
+    userAuthForm: state.userAuthForm,
+    requestPending: state.requestPending,
+    userError: state.userError
   };
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => {
+const mapDispatchToProps = (dispatch) => {
   return {
     onEmailChange: (email) => {
-      dispatch(onSignUpEmailChange(email))
+      dispatch(onSignUpEmailChange(email));
     },
 
     onPasswordChange: (password) => {
-      dispatch(onSignUpPasswordChange(password))
+      dispatch(onSignUpPasswordChange(password));
     },
 
     onFormSubmit: (isSignUp, userAuthForm) => {
       dispatch(initiateHTTPRequest());
 
-      const url = isSignUp ? '/api/user/signup' : '/api/user/login'
+      const url = isSignUp ? '/api/user/signup' : '/api/user/login';
       fetch(url, {
         method: 'POST',
         mode: 'same-origin',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(userAuthForm) 
+        body: JSON.stringify(userAuthForm)
       })
       .then(response => response.json())
       .then((response) => {
         if (response.error) {
-          alert (response.message)
+          alert(response.message);
         } else {
-          auth.login(response.token)
-          browserHistory.push('/profile/' + response.id)
+          auth.login(response.token);
+          browserHistory.push('/profile/' + response.id);
         }
       })
       .catch((err) => dispatch(processHTTPError(err)));
     }
-  }
+  };
 };
 
 const UserAuthFormApp = connect(

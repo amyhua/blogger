@@ -1,18 +1,18 @@
 import { connect } from 'react-redux';
-import { initiateHTTPRequest, processPostListRequestSuccess, processHTTPError } from '../../actions';
-import Posts from '../Posts/Posts';
+import { initiateHTTPRequest, processPostListRequestSuccess, processHTTPError } from '../actions';
+import Posts from '../components/Posts/Posts';
 
 import fetch from 'isomorphic-fetch';
 
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = state => {
   return {
     data: state.data || [],
     requestPending: state.requestPending || false
   };
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => {
+const mapDispatchToProps = dispatch => {
   return {
     onDidMount: () => {
       dispatch(initiateHTTPRequest());

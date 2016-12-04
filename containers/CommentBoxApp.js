@@ -4,19 +4,19 @@ import {
   processHTTPError,
   processPostDetailsRequestSuccess,
   onCommentBoxFormChange,
-} from '../../actions';
+} from '../actions';
 
-import CommentBox from '../CommentBox/CommentBox';
+import CommentBox from '../components/CommentBox/CommentBox';
 
 import fetch from 'isomorphic-fetch';
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = state => {
   return {
     commentForm: state.commentForm || {},
   };
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => {
+const mapDispatchToProps = dispatch => {
   return {
 
     onFormChange: (text) => {

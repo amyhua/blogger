@@ -20,7 +20,7 @@ export default class PostForm extends Component {
 
 	render() {
 		return (
-			<div>
+			<form onSubmit={() => this.handleSubmit(this.props.postForm)}>
 				<div>
 				  <label>Title</label>
 				</div>
@@ -41,15 +41,15 @@ export default class PostForm extends Component {
 				    name="body"
 				    cols="30" rows="10"></textarea>
 				</div>
-				<input type="submit" value="Submit" onClick={() => this.handleSubmit(this.props.postForm)}/>
-			</div>
+				<button type="submit" value="Submit" />
+			</form>
 		);
 	}
-}
+};
 
 PostForm.propTypes = {
 	postForm: PropTypes.object,
 	onTitleChange: PropTypes.func,
 	onBodyChange: PropTypes.func,
 	onFormSubmit: PropTypes.func.isRequired
-}
+};

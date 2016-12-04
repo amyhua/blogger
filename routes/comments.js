@@ -6,7 +6,6 @@ var router = express.Router();
 router.delete('/:id', function(request, response, next) {
   // created a flag called `postId` that will capture the comment's post ID
   // once models.comments.findById promise is fulfilled.
-  console.log('delete comment route');
   var postId;
   models.comments.findById(request.params.id)
     .then(function commentFindSuccess(comment){

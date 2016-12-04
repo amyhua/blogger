@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
-export default class PostForm extends Component {
+export default class UserAuthForm extends Component {
 	constructor(props) {
 		super(props);
 	}
@@ -10,10 +10,11 @@ export default class PostForm extends Component {
 	}
 
 	render() {
-		const header = this.props.signUp ? 'User Sign Up' : 'User Login'
+		const header = this.props.signUp ? 'User Sign Up' : 'User Login';
 		return (
 			<div>
 				<h1>{header}</h1>
+				<div>{this.props.userError}</div>
 				<div>
 				  <label>Email</label>
 				</div>
@@ -40,9 +41,8 @@ export default class PostForm extends Component {
 	}
 }
 
-PostForm.propTypes = {
+UserAuthForm.propTypes = {
 	userAuthForm: PropTypes.object,
 	onEmailChange: PropTypes.func,
-	onPasswordChange: PropTypes.func,
-	onFormSubmit: PropTypes.func.isRequired
-}
+	onPasswordChange: PropTypes.func
+};

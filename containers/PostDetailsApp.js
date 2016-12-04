@@ -1,15 +1,19 @@
 import { connect } from 'react-redux';
-import { initiateHTTPRequest, processHTTPError, processPostDetailsRequestSuccess } from '../../actions';
-import PostDetails from '../Posts/PostDetails';
+import {
+  initiateHTTPRequest,
+  processHTTPError,
+  processPostDetailsRequestSuccess
+} from '../actions';
+import PostDetails from '../components/Posts/PostDetails';
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = state => {
   return {
-    postDetails: state.postDetails || {},
-    requestPending: state.requestPending || false
+    postDetails: state.postDetails,
+    requestPending: state.requestPending
   };
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => {
+const mapDispatchToProps = dispatch => {
   return {
     onDidMount: (postId) => {
       if (postId) {
@@ -20,7 +24,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
           .catch((err) => dispatch(processHTTPError(err)));
       }
     }
-  }
+  };
 };
 
 const PostDetailsApp = connect(

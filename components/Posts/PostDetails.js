@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
 
-import CommentBox from '../ConnectedComponents/CommentBoxApp';
+import CommentBox from '../../containers/CommentBoxApp';
 import CommentList from '../CommentList/CommentList';
 
 export default class PostDetails extends Component {

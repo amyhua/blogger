@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
-export default class PostForm extends Component {
+export default class Profile extends Component {
 	constructor(props) {
 		super(props);
 	}
@@ -24,7 +24,7 @@ export default class PostForm extends Component {
 	}
 }
 
-PostForm.propTypes = {
+Profile.propTypes = {
 	userDetails: PropTypes.object,
 	onDidMount: PropTypes.func
 }

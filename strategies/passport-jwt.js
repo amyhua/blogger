@@ -7,12 +7,12 @@ const User = require('../models/').users;
 
 const opts = {
     jwtFromRequest: ExtractJwt.fromHeader('authorization'),
-    secretOrKey: config.jwtSecret,
+    secretOrKey: config.jwtSecret
 }
 
 module.exports = function(passport) {
-    passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
-        User.findById(jwt_payload.id)
+    passport.use(new JwtStrategy(opts, function(jwtPayload, done) {
+        User.findById(jwtPayload.id)
         .then(function(user) {
             if (user) {
                 // user was found successfully

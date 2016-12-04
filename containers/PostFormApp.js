@@ -5,20 +5,20 @@ import {
   processPostDetailsRequestSuccess,
   onPostFormTitleChange,
   onPostFormBodyChange
-} from '../../actions';
+} from '../actions';
 
-import PostForm from '../Posts/PostForm';
-import { browserHistory } from 'react-router'
+import PostForm from '../components/Posts/PostForm';
+import { browserHistory } from 'react-router';
 
 import fetch from 'isomorphic-fetch';
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = state => {
   return {
-    postForm: state.postForm || {},
+    postForm: state.userAuthForm || {},
   };
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => {
+const mapDispatchToProps = dispatch => {
   return {
 
     onDidMount: (postId) => {
@@ -32,11 +32,11 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
 
     onTitleChange: (title) => {
-      dispatch(onPostFormTitleChange(title))
+      dispatch(onPostFormTitleChange(title));
     },
 
     onBodyChange: (body) => {
-      dispatch(onPostFormBodyChange(body))
+      dispatch(onPostFormBodyChange(body));
     },
 
     onFormSubmit: (postId, post) => {

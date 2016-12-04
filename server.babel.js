@@ -34,13 +34,26 @@ app.use('/api/comments', comments);
 app.use('/api/user', userRoutes);
 
 app.use('/api/protected', function(req, res, next) {
-  passport.authenticate('jwt', {session:false}, function(err, user, jwtError) {
-    if (user) {
-      req.login(user, null, null);
-      next();
-    } else  {
-      next(jwtError);
+  passport.authenticate('jwt', {
+    session: false
+  }, function(err, user, jwtError) {
+    if (err) {
+      return next(err); // 500
     }
+    if (jwtError) {
+      return res.json({
+        error: jwtError
+      });
+    }
+    if (!user) {
+      return res.redirect('/login');
+    }
+    req.logIn(user, function(error) {
+      if (error) {
+        return next(error);
+      }
+      next();
+    });
   })(req, res, next);
 });
 
@@ -82,9 +95,5 @@ if (app.get('env') === 'development') {
     });
   });
 }
-
-
-
-
 
 module.exports = app;

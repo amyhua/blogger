@@ -1,8 +1,8 @@
 const CONFIGURATION = {
   'development': {
     'dialect': 'postgres',
-    'username': process.env.POSTGRES_USERNAME,
-    'password': process.env.POSTGRES_PASSWORD,
+    'username': process.env.NODE_ENV.POSTGRES_USERNAME,
+    'password': process.env.NODE_ENV.POSTGRES_PASSWORD,
     'database': 'blogger_development',
     'jwtSecret': 'blogger_development_MySuperDuperSecret',
     'jwtExpiration': 30 // seconds

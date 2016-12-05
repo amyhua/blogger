@@ -3,8 +3,7 @@ import {
   initiateHTTPRequest,
   processHTTPError,
   processPostDetailsRequestSuccess,
-  onPostFormTitleChange,
-  onPostFormBodyChange
+  onPostFormChange
 } from '../actions';
 
 import PostForm from '../components/Posts/PostForm';
@@ -14,7 +13,7 @@ import fetch from 'isomorphic-fetch';
 
 const mapStateToProps = state => {
   return {
-    postForm: state.userAuthForm || {},
+    postForm: state.postForm || {},
   };
 };
 
@@ -32,11 +31,11 @@ const mapDispatchToProps = dispatch => {
     },
 
     onTitleChange: (title) => {
-      dispatch(onPostFormTitleChange(title));
+      dispatch(onPostFormChange({title}));
     },
 
     onBodyChange: (body) => {
-      dispatch(onPostFormBodyChange(body));
+      dispatch(onPostFormChange({body}));
     },
 
     onFormSubmit: (postId, post) => {

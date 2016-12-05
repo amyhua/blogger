@@ -28794,14 +28794,12 @@
 	var POSTS_LIST_SUCCESS = exports.POSTS_LIST_SUCCESS = 'postsList/POSTS_LIST_SUCCESS';
 	var POST_DETAIL_SUCCESS = exports.POST_DETAIL_SUCCESS = 'post/POST_SUCCESS';
 
-	var POST_FORM_TITLE = exports.POST_FORM_TITLE = 'postForm/POST_FORM_TITLE';
-	var POST_FORM_BODY = exports.POST_FORM_BODY = 'postForm/POST_FORM_BODY';
+	var POST_FORM_UPDATE = exports.POST_FORM_UPDATE = 'postForm/POST_FORM_UPDATE';
 
 	var COMMENT_BOX_CHANGE = exports.COMMENT_BOX_CHANGE = 'commentBox/COMMENT_BOX_CHANGE';
 	var COMMENT_BOX_SUBMIT = exports.COMMENT_BOX_SUBMIT = 'commentBox/COMMENT_BOX_SUBMIT';
 
-	var USER_SIGNUP_EMAIL = exports.USER_SIGNUP_EMAIL = 'userAuth/USER_SIGNUP_EMAIL';
-	var USER_SIGNUP_PASSWORD = exports.USER_SIGNUP_PASSWORD = 'userAuth/USER_SIGNUP_PASSWORD';
+	var USER_AUTH_FORM_UPDATE = exports.USER_AUTH_FORM_UPDATE = 'userAuth/USER_AUTH_FORM_UPDATE';
 	var USER_DETAILS_SUCCESS = exports.USER_DETAILS_SUCCESS = 'userAuth/USER_DETAILS_SUCCESS';
 	var USER_DETAILS_FAILURE = exports.USER_DETAILS_FAILURE = 'userAuth/USER_DETAILS_FAILURE';
 
@@ -28846,17 +28844,10 @@
 	  };
 	};
 
-	var onPostFormTitleChange = exports.onPostFormTitleChange = function onPostFormTitleChange(title) {
+	var onPostFormChange = exports.onPostFormChange = function onPostFormChange(postForm) {
 	  return {
-	    type: POST_FORM_TITLE,
-	    title: title
-	  };
-	};
-
-	var onPostFormBodyChange = exports.onPostFormBodyChange = function onPostFormBodyChange(body) {
-	  return {
-	    type: POST_FORM_BODY,
-	    body: body
+	    type: POST_FORM_UPDATE,
+	    postForm: postForm
 	  };
 	};
 
@@ -28867,18 +28858,10 @@
 	  };
 	};
 
-	var onSignUpEmailChange = exports.onSignUpEmailChange = function onSignUpEmailChange(email) {
-	  console.log('onSignUpEmailChange', email);
+	var onUserAuthFormChange = exports.onUserAuthFormChange = function onUserAuthFormChange(auth) {
 	  return {
-	    type: USER_SIGNUP_EMAIL,
-	    email: email
-	  };
-	};
-
-	var onSignUpPasswordChange = exports.onSignUpPasswordChange = function onSignUpPasswordChange(password) {
-	  return {
-	    type: USER_SIGNUP_PASSWORD,
-	    password: password
+	    type: USER_AUTH_FORM_UPDATE,
+	    auth: auth
 	  };
 	};
 
@@ -29168,6 +29151,28 @@
 	    arrayBuffer: 'ArrayBuffer' in self
 	  }
 
+	  if (support.arrayBuffer) {
+	    var viewClasses = [
+	      '[object Int8Array]',
+	      '[object Uint8Array]',
+	      '[object Uint8ClampedArray]',
+	      '[object Int16Array]',
+	      '[object Uint16Array]',
+	      '[object Int32Array]',
+	      '[object Uint32Array]',
+	      '[object Float32Array]',
+	      '[object Float64Array]'
+	    ]
+
+	    var isDataView = function(obj) {
+	      return obj && DataView.prototype.isPrototypeOf(obj)
+	    }
+
+	    var isArrayBufferView = ArrayBuffer.isView || function(obj) {
+	      return obj && viewClasses.indexOf(Object.prototype.toString.call(obj)) > -1
+	    }
+	  }
+
 	  function normalizeName(name) {
 	    if (typeof name !== 'string') {
 	      name = String(name)
@@ -29221,12 +29226,8 @@
 	  Headers.prototype.append = function(name, value) {
 	    name = normalizeName(name)
 	    value = normalizeValue(value)
-	    var list = this.map[name]
-	    if (!list) {
-	      list = []
-	      this.map[name] = list
-	    }
-	    list.push(value)
+	    var oldValue = this.map[name]
+	    this.map[name] = oldValue ? oldValue+','+value : value
 	  }
 
 	  Headers.prototype['delete'] = function(name) {
@@ -29234,12 +29235,8 @@
 	  }
 
 	  Headers.prototype.get = function(name) {
-	    var values = this.map[normalizeName(name)]
-	    return values ? values[0] : null
-	  }
-
-	  Headers.prototype.getAll = function(name) {
-	    return this.map[normalizeName(name)] || []
+	    name = normalizeName(name)
+	    return this.has(name) ? this.map[name] : null
 	  }
 
 	  Headers.prototype.has = function(name) {
@@ -29247,15 +29244,15 @@
 	  }
 
 	  Headers.prototype.set = function(name, value) {
-	    this.map[normalizeName(name)] = [normalizeValue(value)]
+	    this.map[normalizeName(name)] = normalizeValue(value)
 	  }
 
 	  Headers.prototype.forEach = function(callback, thisArg) {
-	    Object.getOwnPropertyNames(this.map).forEach(function(name) {
-	      this.map[name].forEach(function(value) {
-	        callback.call(thisArg, value, name, this)
-	      }, this)
-	    }, this)
+	    for (var name in this.map) {
+	      if (this.map.hasOwnProperty(name)) {
+	        callback.call(thisArg, this.map[name], name, this)
+	      }
+	    }
 	  }
 
 	  Headers.prototype.keys = function() {
@@ -29300,14 +29297,36 @@
 
 	  function readBlobAsArrayBuffer(blob) {
 	    var reader = new FileReader()
+	    var promise = fileReaderReady(reader)
 	    reader.readAsArrayBuffer(blob)
-	    return fileReaderReady(reader)
+	    return promise
 	  }
 
 	  function readBlobAsText(blob) {
 	    var reader = new FileReader()
+	    var promise = fileReaderReady(reader)
 	    reader.readAsText(blob)
-	    return fileReaderReady(reader)
+	    return promise
+	  }
+
+	  function readArrayBufferAsText(buf) {
+	    var view = new Uint8Array(buf)
+	    var chars = new Array(view.length)
+
+	    for (var i = 0; i < view.length; i++) {
+	      chars[i] = String.fromCharCode(view[i])
+	    }
+	    return chars.join('')
+	  }
+
+	  function bufferClone(buf) {
+	    if (buf.slice) {
+	      return buf.slice(0)
+	    } else {
+	      var view = new Uint8Array(buf.byteLength)
+	      view.set(new Uint8Array(buf))
+	      return view.buffer
+	    }
 	  }
 
 	  function Body() {
@@ -29315,7 +29334,9 @@
 
 	    this._initBody = function(body) {
 	      this._bodyInit = body
-	      if (typeof body === 'string') {
+	      if (!body) {
+	        this._bodyText = ''
+	      } else if (typeof body === 'string') {
 	        this._bodyText = body
 	      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
 	        this._bodyBlob = body
@@ -29323,11 +29344,12 @@
 	        this._bodyFormData = body
 	      } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
 	        this._bodyText = body.toString()
-	      } else if (!body) {
-	        this._bodyText = ''
-	      } else if (support.arrayBuffer && ArrayBuffer.prototype.isPrototypeOf(body)) {
-	        // Only support ArrayBuffers for POST method.
-	        // Receiving ArrayBuffers happens via Blobs, instead.
+	      } else if (support.arrayBuffer && support.blob && isDataView(body)) {
+	        this._bodyArrayBuffer = bufferClone(body.buffer)
+	        // IE 10-11 can't handle a DataView body.
+	        this._bodyInit = new Blob([this._bodyArrayBuffer])
+	      } else if (support.arrayBuffer && (ArrayBuffer.prototype.isPrototypeOf(body) || isArrayBufferView(body))) {
+	        this._bodyArrayBuffer = bufferClone(body)
 	      } else {
 	        throw new Error('unsupported BodyInit type')
 	      }
@@ -29352,6 +29374,8 @@
 
 	        if (this._bodyBlob) {
 	          return Promise.resolve(this._bodyBlob)
+	        } else if (this._bodyArrayBuffer) {
+	          return Promise.resolve(new Blob([this._bodyArrayBuffer]))
 	        } else if (this._bodyFormData) {
 	          throw new Error('could not read FormData body as blob')
 	        } else {
@@ -29360,27 +29384,28 @@
 	      }
 
 	      this.arrayBuffer = function() {
-	        return this.blob().then(readBlobAsArrayBuffer)
-	      }
-
-	      this.text = function() {
-	        var rejected = consumed(this)
-	        if (rejected) {
-	          return rejected
-	        }
-
-	        if (this._bodyBlob) {
-	          return readBlobAsText(this._bodyBlob)
-	        } else if (this._bodyFormData) {
-	          throw new Error('could not read FormData body as text')
+	        if (this._bodyArrayBuffer) {
+	          return consumed(this) || Promise.resolve(this._bodyArrayBuffer)
 	        } else {
-	          return Promise.resolve(this._bodyText)
+	          return this.blob().then(readBlobAsArrayBuffer)
 	        }
 	      }
-	    } else {
-	      this.text = function() {
-	        var rejected = consumed(this)
-	        return rejected ? rejected : Promise.resolve(this._bodyText)
+	    }
+
+	    this.text = function() {
+	      var rejected = consumed(this)
+	      if (rejected) {
+	        return rejected
+	      }
+
+	      if (this._bodyBlob) {
+	        return readBlobAsText(this._bodyBlob)
+	      } else if (this._bodyArrayBuffer) {
+	        return Promise.resolve(readArrayBufferAsText(this._bodyArrayBuffer))
+	      } else if (this._bodyFormData) {
+	        throw new Error('could not read FormData body as text')
+	      } else {
+	        return Promise.resolve(this._bodyText)
 	      }
 	    }
 
@@ -29408,7 +29433,10 @@
 	  function Request(input, options) {
 	    options = options || {}
 	    var body = options.body
-	    if (Request.prototype.isPrototypeOf(input)) {
+
+	    if (typeof input === 'string') {
+	      this.url = input
+	    } else {
 	      if (input.bodyUsed) {
 	        throw new TypeError('Already read')
 	      }
@@ -29419,12 +29447,10 @@
 	      }
 	      this.method = input.method
 	      this.mode = input.mode
-	      if (!body) {
+	      if (!body && input._bodyInit != null) {
 	        body = input._bodyInit
 	        input.bodyUsed = true
 	      }
-	    } else {
-	      this.url = input
 	    }
 
 	    this.credentials = options.credentials || this.credentials || 'omit'
@@ -29442,7 +29468,7 @@
 	  }
 
 	  Request.prototype.clone = function() {
-	    return new Request(this)
+	    return new Request(this, { body: this._bodyInit })
 	  }
 
 	  function decode(body) {
@@ -29458,16 +29484,17 @@
 	    return form
 	  }
 
-	  function headers(xhr) {
-	    var head = new Headers()
-	    var pairs = (xhr.getAllResponseHeaders() || '').trim().split('\n')
-	    pairs.forEach(function(header) {
-	      var split = header.trim().split(':')
-	      var key = split.shift().trim()
-	      var value = split.join(':').trim()
-	      head.append(key, value)
+	  function parseHeaders(rawHeaders) {
+	    var headers = new Headers()
+	    rawHeaders.split('\r\n').forEach(function(line) {
+	      var parts = line.split(':')
+	      var key = parts.shift().trim()
+	      if (key) {
+	        var value = parts.join(':').trim()
+	        headers.append(key, value)
+	      }
 	    })
-	    return head
+	    return headers
 	  }
 
 	  Body.call(Request.prototype)
@@ -29478,10 +29505,10 @@
 	    }
 
 	    this.type = 'default'
-	    this.status = options.status
+	    this.status = 'status' in options ? options.status : 200
 	    this.ok = this.status >= 200 && this.status < 300
-	    this.statusText = options.statusText
-	    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
+	    this.statusText = 'statusText' in options ? options.statusText : 'OK'
+	    this.headers = new Headers(options.headers)
 	    this.url = options.url || ''
 	    this._initBody(bodyInit)
 	  }
@@ -29519,35 +29546,16 @@
 
 	  self.fetch = function(input, init) {
 	    return new Promise(function(resolve, reject) {
-	      var request
-	      if (Request.prototype.isPrototypeOf(input) && !init) {
-	        request = input
-	      } else {
-	        request = new Request(input, init)
-	      }
-
+	      var request = new Request(input, init)
 	      var xhr = new XMLHttpRequest()
-
-	      function responseURL() {
-	        if ('responseURL' in xhr) {
-	          return xhr.responseURL
-	        }
-
-	        // Avoid security warnings on getResponseHeader when not allowed by CORS
-	        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
-	          return xhr.getResponseHeader('X-Request-URL')
-	        }
-
-	        return
-	      }
 
 	      xhr.onload = function() {
 	        var options = {
 	          status: xhr.status,
 	          statusText: xhr.statusText,
-	          headers: headers(xhr),
-	          url: responseURL()
+	          headers: parseHeaders(xhr.getAllResponseHeaders() || '')
 	        }
+	        options.url = 'responseURL' in xhr ? xhr.responseURL : options.headers.get('X-Request-URL')
 	        var body = 'response' in xhr ? xhr.response : xhr.responseText
 	        resolve(new Response(body, options))
 	      }
@@ -29609,7 +29617,7 @@
 
 	var mapStateToProps = function mapStateToProps(state) {
 	  return {
-	    postForm: state.userAuthForm || {}
+	    postForm: state.postForm || {}
 	  };
 	};
 
@@ -29630,11 +29638,11 @@
 	    },
 
 	    onTitleChange: function onTitleChange(title) {
-	      dispatch((0, _actions.onPostFormTitleChange)(title));
+	      dispatch((0, _actions.onPostFormChange)({ title: title }));
 	    },
 
 	    onBodyChange: function onBodyChange(body) {
-	      dispatch((0, _actions.onPostFormBodyChange)(body));
+	      dispatch((0, _actions.onPostFormChange)({ body: body }));
 	    },
 
 	    onFormSubmit: function onFormSubmit(postId, post) {
@@ -29704,7 +29712,8 @@
 			}
 		}, {
 			key: "handleSubmit",
-			value: function handleSubmit(postForm) {
+			value: function handleSubmit(e, postForm) {
+				e.preventDefault();
 				this.props.onFormSubmit(this.props.params.id, {
 					title: postForm.title,
 					body: postForm.body
@@ -29717,8 +29726,8 @@
 
 				return _react2.default.createElement(
 					"form",
-					{ onSubmit: function onSubmit() {
-							return _this2.handleSubmit(_this2.props.postForm);
+					{ onSubmit: function onSubmit(e) {
+							return _this2.handleSubmit(e, _this2.props.postForm);
 						} },
 					_react2.default.createElement(
 						"div",
@@ -29760,7 +29769,7 @@
 							name: "body",
 							cols: "30", rows: "10" })
 					),
-					_react2.default.createElement("button", { type: "submit", value: "Submit" })
+					_react2.default.createElement("input", { type: "submit", value: "Submit" })
 				);
 			}
 		}]);
@@ -30272,11 +30281,11 @@
 	var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 	  return {
 	    onEmailChange: function onEmailChange(email) {
-	      dispatch((0, _actions.onSignUpEmailChange)(email));
+	      dispatch((0, _actions.onUserAuthFormChange)({ email: email }));
 	    },
 
 	    onPasswordChange: function onPasswordChange(password) {
-	      dispatch((0, _actions.onSignUpPasswordChange)(password));
+	      dispatch((0, _actions.onUserAuthFormChange)({ password: password }));
 	    },
 
 	    onFormSubmit: function onFormSubmit(isSignUp, userAuthForm) {
@@ -30291,14 +30300,21 @@
 	        },
 	        body: JSON.stringify(userAuthForm)
 	      }).then(function (response) {
-	        return response.json();
-	      }).then(function (response) {
+
 	        if (response.error) {
-	          alert(response.message);
-	        } else {
-	          _auth2.default.login(response.token);
-	          _reactRouter.browserHistory.push('/profile/' + response.id);
+	          _auth2.default.logout();
+	          dispatch((0, _actions.processUserDetailsRequestFailure)(response.error));
+	          return;
 	        }
+	        return response.json().then(function (json) {
+	          if (json.error) {
+	            _auth2.default.logout();
+	            dispatch((0, _actions.processUserDetailsRequestFailure)(json.error.message));
+	            return;
+	          }
+	          _auth2.default.login(json.token);
+	          _reactRouter.browserHistory.push('/profile/' + json.id);
+	        });
 	      }).catch(function (err) {
 	        return dispatch((0, _actions.processHTTPError)(err));
 	      });
@@ -30847,7 +30863,6 @@
 	        requestPending: false,
 	        error: action.error
 	      });
-
 	    case _actions.POSTS_LIST_SUCCESS:
 	      return Object.assign({}, state, {
 	        requestPending: false,
@@ -30858,22 +30873,12 @@
 	      return Object.assign({}, state, {
 	        requestPending: false,
 	        error: false,
-	        postDetails: action.data,
-	        userAuthForm: action.data
+	        postDetails: Object.assign({}, action.data),
+	        postForm: Object.assign({}, action.data)
 	      });
-	    case _actions.POST_FORM_TITLE:
-	      // TODO: compose reducers
+	    case _actions.POST_FORM_UPDATE:
 	      return Object.assign({}, state, {
-	        postForm: Object.assign({}, state.postForm, {
-	          title: action.title
-	        })
-	      });
-	    case _actions.POST_FORM_BODY:
-	      // TODO: compose reducers
-	      return Object.assign({}, state, {
-	        postForm: Object.assign({}, state.postForm, {
-	          body: action.body
-	        })
+	        postForm: Object.assign({}, state.postForm, action.postForm)
 	      });
 	    case _actions.COMMENT_BOX_CHANGE:
 	      // TODO: compose reducers
@@ -30882,19 +30887,9 @@
 	          text: action.text
 	        })
 	      });
-	    case _actions.USER_SIGNUP_EMAIL:
-	      // TODO: compose reducers
+	    case _actions.USER_AUTH_FORM_UPDATE:
 	      return Object.assign({}, state, {
-	        userAuthForm: Object.assign({}, state.userAuthForm, {
-	          email: action.email
-	        })
-	      });
-	    case _actions.USER_SIGNUP_PASSWORD:
-	      // TODO: compose reducers
-	      return Object.assign({}, state, {
-	        userAuthForm: Object.assign({}, state.userAuthForm, {
-	          password: action.password
-	        })
+	        userAuthForm: Object.assign({}, state.userAuthForm, action.auth)
 	      });
 	    case _actions.USER_DETAILS_SUCCESS:
 	      return Object.assign({}, state, {

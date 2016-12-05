@@ -3,11 +3,9 @@ import {
   HTTP_REQUEST_FAILURE,
   POSTS_LIST_SUCCESS,
   POST_DETAIL_SUCCESS,
-  POST_FORM_TITLE,
-  POST_FORM_BODY,
+  POST_FORM_UPDATE,
   COMMENT_BOX_CHANGE,
-  USER_SIGNUP_EMAIL,
-  USER_SIGNUP_PASSWORD,
+  USER_AUTH_FORM_UPDATE,
   USER_DETAILS_SUCCESS,
   USER_DETAILS_FAILURE
 } from './actions';
@@ -48,7 +46,6 @@ export default (state = initialState, action) => {
         requestPending: false,
         error: action.error
       });
-
     case POSTS_LIST_SUCCESS:
       return Object.assign({}, state, {
         requestPending: false,
@@ -59,22 +56,12 @@ export default (state = initialState, action) => {
       return Object.assign({}, state, {
         requestPending: false,
         error: false,
-        postDetails: action.data,
-        userAuthForm: action.data
+        postDetails: Object.assign({}, action.data),
+        postForm: Object.assign({}, action.data)
       });
-    case POST_FORM_TITLE:
-      // TODO: compose reducers
+    case POST_FORM_UPDATE:
       return Object.assign({}, state, {
-        postForm: Object.assign({}, state.postForm, {
-          title: action.title
-        })
-      });
-    case POST_FORM_BODY:
-      // TODO: compose reducers
-      return Object.assign({}, state, {
-        postForm: Object.assign({}, state.postForm, {
-          body: action.body
-        })
+        postForm: Object.assign({}, state.postForm, action.postForm)
       });
     case COMMENT_BOX_CHANGE:
       // TODO: compose reducers
@@ -83,19 +70,9 @@ export default (state = initialState, action) => {
           text: action.text
         })
       });
-    case USER_SIGNUP_EMAIL:
-      // TODO: compose reducers
+    case USER_AUTH_FORM_UPDATE:
       return Object.assign({}, state, {
-        userAuthForm: Object.assign({}, state.userAuthForm, {
-          email: action.email
-        })
-      });
-    case USER_SIGNUP_PASSWORD:
-      // TODO: compose reducers
-      return Object.assign({}, state, {
-        userAuthForm: Object.assign({}, state.userAuthForm, {
-          password: action.password
-        })
+        userAuthForm: Object.assign({}, state.userAuthForm, action.auth)
       });
     case USER_DETAILS_SUCCESS:
       return Object.assign({}, state, {

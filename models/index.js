@@ -8,6 +8,8 @@ var config    = require(path.join(__dirname, '..', 'config', 'config.json'))[env
 
 // Init sequelize with params from config file
 console.log('Create sequelize...');
+console.log('config env', env);
+console.log('config', config);
 var sequelize = new Sequelize(config.database, config.username, config.password, config);
 
 // Empty db object to hold our models

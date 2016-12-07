@@ -10,7 +10,8 @@ var config    = require(path.join(__dirname, '..', 'config', 'config.json'))[env
 console.log('Create sequelize...');
 console.log('config env', env);
 console.log('config', config);
-var sequelize = new Sequelize(config.database, config.username, config.password, config);
+
+const sequelize = new Sequelize(process.env.DATABASE_URL);
 
 // Empty db object to hold our models
 var db        = {};

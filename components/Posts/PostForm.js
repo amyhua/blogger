@@ -11,7 +11,8 @@ export default class PostForm extends Component {
 		}
 	}
 
-	handleSubmit(postForm) {
+	handleSubmit(e, postForm) {
+		e.preventDefault();
 		this.props.onFormSubmit(this.props.params.id, {
 			title: postForm.title,
 			body: postForm.body
@@ -20,7 +21,7 @@ export default class PostForm extends Component {
 
 	render() {
 		return (
-			<form onSubmit={() => this.handleSubmit(this.props.postForm)}>
+			<form onSubmit={(e) => this.handleSubmit(e, this.props.postForm)}>
 				<div>
 				  <label>Title</label>
 				</div>
@@ -41,7 +42,7 @@ export default class PostForm extends Component {
 				    name="body"
 				    cols="30" rows="10"></textarea>
 				</div>
-				<button type="submit" value="Submit" />
+				<input type="submit" value="Submit"/>
 			</form>
 		);
 	}

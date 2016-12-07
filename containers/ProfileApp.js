@@ -10,8 +10,6 @@ import fetch from 'isomorphic-fetch';
 import auth from '../services/auth';
 import { browserHistory } from 'react-router';
 
-
-
 const mapStateToProps = state => {
   return {
     userDetails: state.userDetails,
@@ -36,15 +34,15 @@ const mapDispatchToProps = dispatch => {
           return;
         }
         return response.json()
-          .then(json => {
-            if (json.error) {
-              auth.logout();
-              dispatch(processUserDetailsRequestFailure(json.error.message));
-              browserHistory.push('/login');
-              return;
-            }
-            dispatch(processUserDetailsRequestSuccess(json));
-          });
+        .then(json => {
+          if (json.error) {
+            auth.logout();
+            dispatch(processUserDetailsRequestFailure(json.error.message));
+            browserHistory.push('/login');
+            return;
+          }
+          dispatch(processUserDetailsRequestSuccess(json));
+        });
       })
       .catch((err) => {
         console.error(err);

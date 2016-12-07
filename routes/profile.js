@@ -9,11 +9,7 @@ router.get('/profile/:id', function(req, res, next) {
 	// see http://eslint.org/docs/2.0.0/user-guide/configuring#configuring-rules
 	/*eslint eqeqeq:0, curly: 2*/
 	if (req.params.id != req.user.id) {
-		console.error('You do not have access to this information');
-		return next({
-			error: true,
-			message: 'You do not have access to this information'
-		});
+		return next(new Error('You do not have access to this information'));
 	}
 	models.users.findById(req.user.id)
 	.then(function(user) {

@@ -15,10 +15,7 @@ module.exports = function(passport) {
 			}
 
 			if (!user) {
-				return next({
-					error: true,
-					message: info
-				});
+				return next(new Error(info));
 			}
 
 			req.login(user, function(loginErr) {
@@ -38,10 +35,7 @@ module.exports = function(passport) {
 			}
 
 			if (!user) {
-				return next({
-					error: true,
-					message: info
-				});
+				return next(new Error(info));
 			}
 
 			req.login(user, function(loginErr) {

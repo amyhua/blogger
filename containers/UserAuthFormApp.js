@@ -1,8 +1,8 @@
 import { connect } from 'react-redux';
 import {
   initiateHTTPRequest,
-  onSignUpEmailChange,
-  onSignUpPasswordChange,
+  onUserAuthFormChange,
+  processUserDetailsRequestFailure,
   processHTTPError
 } from '../actions';
 
@@ -26,11 +26,11 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     onEmailChange: (email) => {
-      dispatch(onSignUpEmailChange(email));
+      dispatch(onUserAuthFormChange({email}));
     },
 
     onPasswordChange: (password) => {
-      dispatch(onSignUpPasswordChange(password));
+      dispatch(onUserAuthFormChange({password}));
     },
 
     onFormSubmit: (isSignUp, userAuthForm) => {
@@ -45,14 +45,23 @@ const mapDispatchToProps = (dispatch) => {
         },
         body: JSON.stringify(userAuthForm)
       })
-      .then(response => response.json())
       .then((response) => {
+
         if (response.error) {
-          alert(response.message);
-        } else {
-          auth.login(response.token);
-          browserHistory.push('/profile/' + response.id);
+          auth.logout();
+          dispatch(processUserDetailsRequestFailure(response.error));
+          return;
         }
+        return response.json()
+        .then(json => {
+          if (json.error) {
+            auth.logout();
+            dispatch(processUserDetailsRequestFailure(json.error.message));
+            return;
+          }
+          auth.login(json.token);
+          browserHistory.push('/profile/' + json.id);
+        });
       })
       .catch((err) => dispatch(processHTTPError(err)));
     }

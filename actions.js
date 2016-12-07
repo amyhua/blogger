@@ -4,14 +4,12 @@ export const HTTP_REQUEST_FAILURE = 'common/HTTP_REQUEST_FAILURE';
 export const POSTS_LIST_SUCCESS = 'postsList/POSTS_LIST_SUCCESS';
 export const POST_DETAIL_SUCCESS = 'post/POST_SUCCESS';
 
-export const POST_FORM_TITLE = 'postForm/POST_FORM_TITLE';
-export const POST_FORM_BODY = 'postForm/POST_FORM_BODY';
+export const POST_FORM_UPDATE = 'postForm/POST_FORM_UPDATE';
 
 export const COMMENT_BOX_CHANGE = 'commentBox/COMMENT_BOX_CHANGE';
 export const COMMENT_BOX_SUBMIT = 'commentBox/COMMENT_BOX_SUBMIT';
 
-export const USER_SIGNUP_EMAIL = 'userAuth/USER_SIGNUP_EMAIL';
-export const USER_SIGNUP_PASSWORD = 'userAuth/USER_SIGNUP_PASSWORD';
+export const USER_AUTH_FORM_UPDATE = 'userAuth/USER_AUTH_FORM_UPDATE';
 export const USER_DETAILS_SUCCESS = 'userAuth/USER_DETAILS_SUCCESS';
 export const USER_DETAILS_FAILURE = 'userAuth/USER_DETAILS_FAILURE';
 
@@ -57,17 +55,10 @@ export const processUserDetailsRequestFailure = error => {
   };
 };
 
-export const onPostFormTitleChange = title => {
+export const onPostFormChange = postForm => {
   return {
-    type: POST_FORM_TITLE,
-    title
-  };
-};
-
-export const onPostFormBodyChange = body => {
-  return {
-    type: POST_FORM_BODY,
-    body
+    type: POST_FORM_UPDATE,
+    postForm
   };
 };
 
@@ -78,17 +69,9 @@ export const onCommentBoxFormChange = text => {
   };
 };
 
-export const onSignUpEmailChange = email => {
-  console.log('onSignUpEmailChange', email);
+export const onUserAuthFormChange = auth => {
   return {
-    type: USER_SIGNUP_EMAIL,
-    email
-  };
-};
-
-export const onSignUpPasswordChange = password => {
-  return {
-    type: USER_SIGNUP_PASSWORD,
-    password
+    type: USER_AUTH_FORM_UPDATE,
+    auth
   };
 };

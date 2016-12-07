@@ -41,12 +41,10 @@ app.use('/api/protected', function(req, res, next) {
       return next(err); // 500
     }
     if (jwtError) {
-      return res.json({
-        error: jwtError
-      });
+      return next(err);
     }
     if (!user) {
-      return res.redirect('/login');
+      return next(new Error('No User found matching authentication'));
     }
     req.logIn(user, function(error) {
       if (error) {
@@ -75,20 +73,22 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(err, req, res) {
-    console.error('DEV ERROR')
-    res.status(err.status || 500);
+  app.use(function(err, req, res, next) {
+    console.log('DEV_ERROR: ', err.stack)
+    res.status(500);
     res.json({
-      message: err.message,
-      error: err
+      error: {
+        message: err.message,
+        error: true
+      }
     });
   });
 } else {
   // production error handler
   // no stacktraces leaked to user
-  app.use(function(err, req, res) {
-    res.status(err.status || 500);
-    console.error('PROD ERROR')
+  app.use(function(err, req, res, next) {
+    res.status(500);
+    console.log('PROD ERROR')
     res.json({
       message: err.message,
       error: {}
